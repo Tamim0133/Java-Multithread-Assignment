@@ -350,6 +350,7 @@ class WithdrawProcessing extends Thread {
 }
 
 public class Roll_53 {
+    @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         Account[] arr = new Account[30];
 
