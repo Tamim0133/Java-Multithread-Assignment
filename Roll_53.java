@@ -279,165 +279,38 @@ class WithdrawGenerationThread extends Thread {
 }
 
 
-
-/*-----------------------------------------
-            Deposit Processing
- -------------------------------------*/
-class DepositProcessing extends Thread {
-    private final Account[] arr;
-    private final ArrayList < Integer > [] depositArr;
-    DepositProcessing(ArrayList < Integer > [] depositArr, Account[] arr) {
-        this.depositArr = depositArr;
-        this.arr = arr;
-    }
-
-    public void check(int a, Integer b, int i) throws TransactionLimitException {
-        if (b > a) throw new TransactionLimitException("Maximum DepositTransaction Limit Violated" + "Deposit : " + b + " Max : " + a + " for user : " + i);
-    }
-
-    public synchronized void run() {
-        for (int i = 0; i < 30; i++) {
-            for (Integer ele: depositArr[i]) {
-                try {
-                    check(arr[i].getTransactionLimit(), (int) ele, i + (int) 1);
-                    arr[i].addBalance(ele);
-                } catch (Exception e) {
-                    System.out.println((e));
-                }
-            }
-            System.out.println();
-        }
-    }
-
-}
-
-
-
-/*-----------------------------------------
-            WithDraw Processing
- -------------------------------------*/
-class WithdrawProcessing extends Thread {
-    private final Account[] arr;
-    private final ArrayList < Integer > [] withdrawArr;
-    WithdrawProcessing(ArrayList < Integer > [] withdrawArr, Account[] arr) {
-        this.withdrawArr = withdrawArr;
-        this.arr = arr;
-    }
-
-    public void check(int a, Integer b, int i) throws TransactionLimitException {
-        if (b > a) throw new TransactionLimitException("Maximum DepositTransaction Limit Violated" + "Deposit : " + b + " Max : " + a + " for user : " + i);
-    }
-
-    public synchronized void run() {
-        for (int i = 0; i < 30; i++) {
-            for (Integer ele: withdrawArr[i]) {
-                try {
-                    check(arr[i].getTransactionLimit(), (int) ele, i + (int) 1);
-                    try {
-                        arr[i].withdraw(ele);
-                    } catch (Exception e) {
-                        // TODO: handle exception
-                        System.out.println(e);
-                    }
-                } catch (Exception e) {
-                    System.out.println((e));
-                }
-            }
-            System.out.println();
-        }
-    }
-
-}
-
 public class Roll_53 {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         Account[] arr = new Account[30];
 
-        ArrayList < Integer > [] depositArr = new ArrayList[30];
-        ArrayList < Integer > [] withdrawArr = new ArrayList[30];
-        for (int i = 0; i < 30; i++) {
-            depositArr[i] = new ArrayList < > ();
-            withdrawArr[i] = new ArrayList < > ();
-        }
 
         AccountGenerationThread accountGenerationThread = new AccountGenerationThread(arr);
-        DepositGenerationThread depositGenerationThread = new DepositGenerationThread(depositArr);
-        WithdrawGenerationThread withdrawGenerationThread = new WithdrawGenerationThread(withdrawArr);
-
+        
         accountGenerationThread.start();
-        depositGenerationThread.start();
-        withdrawGenerationThread.start();
-
+    
         try {
             accountGenerationThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        try {
-            depositGenerationThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
 
-        try {
-            withdrawGenerationThread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        // System.out.println("--------------------------------------------------------");
+        // System.out.println("--------------------------------------------------------");
+        // System.out.println("---------     REMAINING MONEY  -------------------");
+        // System.out.println("--------------------------------------------------------");
+        // System.out.println("--------------------------------------------------------");
 
-
-
-        Random random = new Random();
-        int worker_thread = random.nextInt(4) + 2; // Random Number between 2 and 5
-
-        DepositProcessing[] depositProcessing = new DepositProcessing[worker_thread];
-
-        for (int i = 0; i < worker_thread; i++) {
-            depositProcessing[i] = new DepositProcessing(depositArr, arr);
-            depositProcessing[i].start();
-
-        }
-
-        for (int i = 1; i <= worker_thread; i++) {
-            try {
-                depositProcessing[i].join();
-            } catch (Exception e) {
-            }
-        }
-
-        WithdrawProcessing[] withdrawProcessings = new WithdrawProcessing[worker_thread];
-
-        for (int i = 0; i < worker_thread; i++) {
-            withdrawProcessings[i] = new WithdrawProcessing(depositArr, arr);
-            withdrawProcessings[i].start();
-
-        }
-
-        for (int i = 1; i <= worker_thread; i++) {
-            try {
-                withdrawProcessings[i].join();
-            } catch (Exception e) {
-                // TODO: handle exception
-            }
-        }
-
-        System.out.println("--------------------------------------------------------");
-        System.out.println("--------------------------------------------------------");
-        System.out.println("---------     REMAINING MONEY  -------------------");
-        System.out.println("--------------------------------------------------------");
-        System.out.println("--------------------------------------------------------");
-
-        int count = 1;
-        for (Account account: arr) {
-            System.out.println(count++);
-            if (account != null) { // Check if the account object is not null
-                account.printInfo();
-            } else {
-                System.out.println("Account object is null");
-            }
-        }
+        // int count = 1;
+        // for (Account account: arr) {
+        //     System.out.println(count++);
+        //     if (account != null) { // Check if the account object is not null
+        //         account.printInfo();
+        //     } else {
+        //         System.out.println("Account object is null");
+        //     }
+        // }
 
         // Print All deposited Money
         // for(int i = 0; i < 30; i++)
